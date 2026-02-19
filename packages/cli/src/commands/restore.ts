@@ -1,7 +1,7 @@
 import { Command } from 'commander';
 import * as fs from 'fs';
 import * as path from 'path';
-import { activate, getEngine, deactivate } from '@soulchain/openclaw';
+import { activate, getEngine, deactivate } from '@openclaused/openclaw';
 import { success, error, info, colors } from '../branding';
 
 export const restoreCommand = new Command('restore')

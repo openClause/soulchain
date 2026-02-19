@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import type { SyncEngine } from '@soulchain/core';
+import type { SyncEngine } from '@openclaused/core';
 
 export class SoulchainHook {
   private engine: SyncEngine;

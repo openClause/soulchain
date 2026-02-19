@@ -1,0 +1,62 @@
+{
+  "name": "@openclaused/soulchain",
+  "version": "0.2.0",
+  "description": "SoulChain — sovereign identity anchored on-chain. Unified package combining core crypto, OpenClaw integration, CLI, and dashboard.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "soulchain": "./dist/cli/index.js"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./core": {
+      "types": "./dist/core/index.d.ts",
+      "default": "./dist/core/index.js"
+    },
+    "./openclaw": {
+      "types": "./dist/openclaw/index.d.ts",
+      "default": "./dist/openclaw/index.js"
+    },
+    "./cli": {
+      "types": "./dist/cli/index.d.ts",
+      "default": "./dist/cli/index.js"
+    },
+    "./dashboard": {
+      "types": "./dist/dashboard/index.d.ts",
+      "default": "./dist/dashboard/index.js"
+    }
+  },
+  "files": ["dist"],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/openClause/soulchain",
+    "directory": "packages/soulchain"
+  },
+  "keywords": ["blockchain", "identity", "evm", "encryption", "soulchain", "ai-agent", "openclaw"],
+  "scripts": {
+    "build": "tsc"
+  },
+  "dependencies": {
+    "@noble/ed25519": "^2.2.0",
+    "@noble/hashes": "^2.0.1",
+    "argon2": "^0.41.1",
+    "better-sqlite3": "^12.6.2",
+    "chalk": "^4.1.2",
+    "commander": "^12.0.0"
+  },
+  "peerDependencies": {
+    "ethers": "^6.0.0"
+  },
+  "peerDependenciesMeta": {
+    "ethers": { "optional": true }
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.13",
+    "@types/node": "^22.0.0",
+    "typescript": "^5.7.0"
+  }
+}

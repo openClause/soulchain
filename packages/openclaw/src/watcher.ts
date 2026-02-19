@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import type { SoulchainConfig, SyncEngine } from '@soulchain/core';
+import type { SoulchainConfig, SyncEngine } from '@openclaused/core';
 
 export class FileWatcher {
   private config: SoulchainConfig;

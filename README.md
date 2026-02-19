@@ -56,6 +56,49 @@ soulchain import        # Import bundle into new workspace
 - `@soulchain/cli` — Command-line interface
 - `@soulchain/contracts` — Solidity smart contracts
 
+## OpenClaw Integration
+
+SoulChain works as an OpenClaw skill for seamless agent integration.
+
+### Install the Skill
+
+Copy or symlink the skill into your OpenClaw skills directory:
+
+```bash
+# From the workspace
+cp -r skills/soulchain/ ~/.openclaw/workspace/skills/soulchain/
+# Or if using the soulchain repo directly:
+cp -r packages/openclaw/skill/ ~/.openclaw/workspace/skills/soulchain/
+```
+
+### Usage
+
+Once the skill is installed, OpenClaw agents can:
+
+- Initialize SoulChain: `bash skills/soulchain/scripts/init.sh`
+- Check status: `bash skills/soulchain/scripts/status.sh`
+- Verify integrity: `npx soulchain verify`
+- View history: `npx soulchain history [file]`
+- Restore from chain: `npx soulchain restore [file]`
+
+The skill's `SKILL.md` provides full instructions to the agent automatically when identity anchoring or file integrity tasks are triggered.
+
+### Programmatic Usage (OpenClaw Extension)
+
+```typescript
+import { activate, deactivate, getEngine } from '@openclaused/openclaw';
+
+// Activate — installs fs hooks + file watcher
+await activate('/path/to/workspace');
+
+// Get engine for direct operations
+const engine = getEngine();
+const report = await engine.verifyIntegrity();
+
+// Deactivate when done
+await deactivate();
+```
+
 ## License
 
 MIT

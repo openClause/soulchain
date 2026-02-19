@@ -17,10 +17,10 @@ importers:
 
   packages/cli:
     dependencies:
-      '@soulchain/core':
+      '@openclaused/core':
         specifier: workspace:*
         version: link:../core
-      '@soulchain/openclaw':
+      '@openclaused/openclaw':
         specifier: workspace:*
         version: link:../openclaw
       chalk:
@@ -94,7 +94,7 @@ importers:
 
   packages/dashboard:
     dependencies:
-      '@soulchain/core':
+      '@openclaused/core':
         specifier: workspace:*
         version: link:../core
     devDependencies:
@@ -104,7 +104,7 @@ importers:
 
   packages/openclaw:
     dependencies:
-      '@soulchain/core':
+      '@openclaused/core':
         specifier: workspace:*
         version: link:../core
     devDependencies:
@@ -117,6 +117,40 @@ importers:
       vitest:
         specifier: ^3.0.0
         version: 3.2.4(@types/node@22.19.11)
+
+  packages/soulchain:
+    dependencies:
+      '@noble/ed25519':
+        specifier: ^2.2.0
+        version: 2.3.0
+      '@noble/hashes':
+        specifier: ^2.0.1
+        version: 2.0.1
+      argon2:
+        specifier: ^0.41.1
+        version: 0.41.1
+      better-sqlite3:
+        specifier: ^12.6.2
+        version: 12.6.2
+      chalk:
+        specifier: ^4.1.2
+        version: 4.1.2
+      commander:
+        specifier: ^12.0.0
+        version: 12.1.0
+      ethers:
+        specifier: ^6.0.0
+        version: 6.16.0
+    devDependencies:
+      '@types/better-sqlite3':
+        specifier: ^7.6.13
+        version: 7.6.13
+      '@types/node':
+        specifier: ^22.0.0
+        version: 22.19.11
+      typescript:
+        specifier: ^5.7.0
+        version: 5.9.3
 
 packages:
 

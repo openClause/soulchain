@@ -1,5 +1,5 @@
 {
-  "name": "@soulchain/core",
+  "name": "@openclaused/core",
   "version": "0.1.0",
   "description": "Core library for SoulChain — cryptographic identity anchoring on EVM blockchains",
   "main": "dist/index.js",

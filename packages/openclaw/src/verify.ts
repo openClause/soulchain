@@ -1,4 +1,4 @@
-import type { SyncEngine, IntegrityReport, SoulchainConfig } from '@soulchain/core';
+import type { SyncEngine, IntegrityReport, SoulchainConfig } from '@openclaused/core';
 
 export async function verifyOnStartup(
   engine: SyncEngine,

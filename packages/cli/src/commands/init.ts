@@ -1,6 +1,6 @@
 import { Command } from 'commander';
-import { initSoulchain } from '@soulchain/openclaw';
-import type { InitOptions } from '@soulchain/openclaw';
+import { initSoulchain } from '@openclaused/openclaw';
+import type { InitOptions } from '@openclaused/openclaw';
 import { printLogo, success, info, progressBar, colors } from '../branding';
 
 const CHAIN_CHOICES = [

@@ -1,5 +1,5 @@
 import { Command } from 'commander';
-import { loadConfig } from '@soulchain/core';
+import { loadConfig } from '@openclaused/core';
 import { printHeader, error, colors } from '../branding';
 
 export const statusCommand = new Command('status')

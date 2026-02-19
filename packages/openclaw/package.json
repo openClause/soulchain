@@ -1,5 +1,5 @@
 {
-  "name": "@soulchain/openclaw",
+  "name": "@openclaused/openclaw",
   "version": "0.1.0",
   "description": "OpenClaw integration for SoulChain — automatic file sync hooks and workspace management",
   "main": "dist/index.js",
@@ -17,10 +17,10 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@soulchain/core": "workspace:*"
+    "@openclaused/core": "workspace:*"
   },
   "peerDependencies": {
-    "@soulchain/core": ">=0.1.0"
+    "@openclaused/core": ">=0.1.0"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",

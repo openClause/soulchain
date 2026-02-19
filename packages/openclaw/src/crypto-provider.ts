@@ -1,5 +1,5 @@
-import { encrypt, decrypt, sign, toHex } from '@soulchain/core';
-import type { EncryptedData, CryptoProvider, Keypair } from '@soulchain/core';
+import { encrypt, decrypt, sign, toHex } from '@openclaused/core';
+import type { EncryptedData, CryptoProvider, Keypair } from '@openclaused/core';
 
 export function createCryptoProvider(keypair: Keypair): CryptoProvider {
   return {

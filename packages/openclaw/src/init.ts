@@ -11,8 +11,8 @@ import {
   SyncEngine,
   DEFAULT_CONFIG,
   sha256,
-} from '@soulchain/core';
-import type { SoulchainConfig, ChainConfig, MigrationReport, CryptoProvider } from '@soulchain/core';
+} from '@openclaused/core';
+import type { SoulchainConfig, ChainConfig, MigrationReport, CryptoProvider } from '@openclaused/core';
 import { createCryptoProvider } from './crypto-provider';
 
 export interface InitOptions {

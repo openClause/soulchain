@@ -12,8 +12,8 @@ import {
   sign,
   toHex,
   MockStorageAdapter,
-} from '@soulchain/core';
-import type { CryptoProvider, SoulchainConfig } from '@soulchain/core';
+} from '@openclaused/core';
+import type { CryptoProvider, SoulchainConfig } from '@openclaused/core';
 
 function createTestCrypto(keypair: { publicKey: Uint8Array; secretKey: Uint8Array }): CryptoProvider {
   return {

@@ -1,8 +1,8 @@
 {
-  "name": "@soulchain/dashboard",
+  "name": "@openclaused/dashboard",
   "version": "0.1.0",
   "main": "dist/index.js",
   "scripts": { "build": "tsc" },
-  "dependencies": { "@soulchain/core": "workspace:*" },
+  "dependencies": { "@openclaused/core": "workspace:*" },
   "devDependencies": { "typescript": "^5.7.0" }
 }

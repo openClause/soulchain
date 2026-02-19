@@ -1,7 +1,7 @@
 import { Command } from 'commander';
 import * as fs from 'fs';
 import * as path from 'path';
-import { loadConfig, sha256 } from '@soulchain/core';
+import { loadConfig, sha256 } from '@openclaused/core';
 import { success, error, info, colors } from '../branding';
 
 export const exportCommand = new Command('export')

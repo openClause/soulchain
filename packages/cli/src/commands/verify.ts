@@ -1,5 +1,5 @@
 import { Command } from 'commander';
-import { activate, getEngine, deactivate } from '@soulchain/openclaw';
+import { activate, getEngine, deactivate } from '@openclaused/openclaw';
 import { printHeader, success, warn, error, info, colors } from '../branding';
 
 export const verifyCommand = new Command('verify')

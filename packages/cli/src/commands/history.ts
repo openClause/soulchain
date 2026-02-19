@@ -1,5 +1,5 @@
 import { Command } from 'commander';
-import { loadConfig, MockChainProvider } from '@soulchain/core';
+import { loadConfig, MockChainProvider } from '@openclaused/core';
 import { info, colors } from '../branding';
 
 export const historyCommand = new Command('history')

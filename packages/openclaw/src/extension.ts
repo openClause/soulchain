@@ -4,8 +4,8 @@ import {
   createStorageAdapter,
   MockChainProvider,
   SyncEngine,
-} from '@soulchain/core';
-import type { Keypair } from '@soulchain/core';
+} from '@openclaused/core';
+import type { Keypair } from '@openclaused/core';
 import * as fs from 'fs';
 import * as path from 'path';
 import { SoulchainHook } from './hook';
