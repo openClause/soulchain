@@ -154,6 +154,18 @@ export class SyncEngine {
     return report;
   }
 
+  async getLatestVersion(filePath: string): Promise<number> {
+    const docType = pathToDocType(filePath);
+    const doc = await this.chain.latestDocument(docType);
+    return doc ? doc.version : -1;
+  }
+
+  async getLatestHash(filePath: string): Promise<string | null> {
+    const docType = pathToDocType(filePath);
+    const doc = await this.chain.latestDocument(docType);
+    return doc ? doc.contentHash : null;
+  }
+
   status(): SyncStatus {
     return {
       pendingFiles: this.pendingCount,

@@ -28,10 +28,11 @@ export type {
 // OpenClaw integration exports
 export {
   SoulchainHook, FileWatcher, verifyOnStartup, initSoulchain,
-  activate, deactivate, getEngine, createCryptoProvider,
+  activate, deactivate, getEngine, getCacheManager, createCryptoProvider,
+  CacheManager,
 } from './openclaw/index';
 
-export type { InitOptions, InitResult } from './openclaw/index';
+export type { InitOptions, InitResult, CacheEntry, CacheMetadata } from './openclaw/index';
 
 // Dashboard exports
 export { VERSION as DASHBOARD_VERSION } from './dashboard/index';
