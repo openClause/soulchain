@@ -36,9 +36,48 @@ export async function activate(workspaceDir: string, passphrase?: string): Promi
     publicKey: new Uint8Array(secretKey.slice(32)), // Ed25519: last 32 bytes of 64-byte secret = public
   };
 
-  // 3. Create engine
-  const chain = new MockChainProvider(workspaceDir); // Persists to .soulchain/mock-chain.json
-  // For mock storage, pass workspaceDir so blobs persist to disk
+  // 3. Create engine — select chain provider based on config
+  let chain: any;
+  const chainConfig = config.chain;
+
+  if (typeof chainConfig === 'object' && chainConfig.type === 'self-hosted') {
+    const { SelfHostedChain, ANVIL_PRIVATE_KEY } = await import('../core/sync/self-hosted');
+    const { EVMChainProvider } = await import('../core/sync/chain-evm');
+    const selfHosted = new SelfHostedChain({
+      dataDir: chainConfig.dataDir ?? path.join(workspaceDir, '.soulchain'),
+      port: chainConfig.port ?? 8545,
+      engine: chainConfig.engine ?? 'anvil',
+    });
+    await selfHosted.start();
+    const contractAddress = chainConfig.contractAddress ?? await selfHosted.ensureContract();
+    chain = new EVMChainProvider({
+      name: 'Self-hosted',
+      rpcUrl: selfHosted.getRpcUrl(),
+      chainId: 31337,
+      contractAddress,
+      privateKey: ANVIL_PRIVATE_KEY,
+    });
+  } else if (chainConfig === 'self-hosted') {
+    const { SelfHostedChain, ANVIL_PRIVATE_KEY } = await import('../core/sync/self-hosted');
+    const { EVMChainProvider } = await import('../core/sync/chain-evm');
+    const selfHosted = new SelfHostedChain({
+      dataDir: path.join(workspaceDir, '.soulchain'),
+      port: 8545,
+      engine: 'anvil',
+    });
+    await selfHosted.start();
+    const contractAddress = await selfHosted.ensureContract();
+    chain = new EVMChainProvider({
+      name: 'Self-hosted',
+      rpcUrl: selfHosted.getRpcUrl(),
+      chainId: 31337,
+      contractAddress,
+      privateKey: ANVIL_PRIVATE_KEY,
+    });
+  } else {
+    chain = new MockChainProvider(workspaceDir);
+  }
+
   const storage = config.storage === 'mock'
     ? new MockStorageAdapter(workspaceDir)
     : createStorageAdapter(config);

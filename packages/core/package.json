@@ -4,7 +4,7 @@
   "description": "Core library for SoulChain — cryptographic identity anchoring on EVM blockchains",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "files": ["dist"],
+  "files": ["dist", "artifacts"],
   "license": "MIT",
   "repository": {
     "type": "git",

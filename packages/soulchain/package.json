@@ -1,6 +1,6 @@
 {
   "name": "@openclaused/soulchain",
-  "version": "0.3.3",
+  "version": "0.5.2",
   "description": "SoulChain — sovereign identity anchored on-chain. Unified package combining core crypto, OpenClaw integration, CLI, and dashboard.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -30,7 +30,8 @@
     }
   },
   "files": [
-    "dist"
+    "dist",
+    "artifacts"
   ],
   "license": "MIT",
   "repository": {
@@ -56,15 +57,8 @@
     "argon2": "^0.41.1",
     "better-sqlite3": "^12.6.2",
     "chalk": "^4.1.2",
-    "commander": "^12.0.0"
-  },
-  "peerDependencies": {
+    "commander": "^12.0.0",
     "ethers": "^6.0.0"
-  },
-  "peerDependenciesMeta": {
-    "ethers": {
-      "optional": true
-    }
   },
   "devDependencies": {
     "@types/better-sqlite3": "^7.6.13",

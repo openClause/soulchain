@@ -16,7 +16,7 @@ export { createStorageAdapter, MockStorageAdapter, IpfsStorageAdapter, ArweaveSt
 export type { StorageAdapter, StorageConfig } from './storage';
 
 // Sync
-export { SyncEngine, SyncWorker, SyncQueue, MockChainProvider, BaseChainProvider, BASE_NETWORKS, EVMChainProvider, CHAINS, SelfHostedChain, PublicAnchor, createChainProvider } from './sync';
+export { SyncEngine, SyncWorker, SyncQueue, MockChainProvider, BaseChainProvider, BASE_NETWORKS, EVMChainProvider, CHAINS, SelfHostedChain, PublicAnchor, ANVIL_PRIVATE_KEY, createChainProvider } from './sync';
 export type { ChainProvider, DocumentEntry, CryptoProvider, IntegrityReport, MigrationReport, SyncStatus, SyncItem, SyncWorkerConfig, BaseChainConfig, EVMChainConfig, SelfHostedConfig, PublicAnchorConfig } from './sync';
 
 // Config

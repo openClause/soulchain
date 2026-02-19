@@ -4,7 +4,7 @@ export { BaseChainProvider, BASE_NETWORKS } from './chain-base';
 export type { BaseChainConfig } from './chain-base';
 export { EVMChainProvider, CHAINS } from './chain-evm';
 export type { EVMChainConfig } from './chain-evm';
-export { SelfHostedChain, PublicAnchor } from './self-hosted';
+export { SelfHostedChain, PublicAnchor, ANVIL_PRIVATE_KEY } from './self-hosted';
 export type { SelfHostedConfig, PublicAnchorConfig } from './self-hosted';
 export { SyncQueue } from './queue';
 export type { SyncItem } from './queue';

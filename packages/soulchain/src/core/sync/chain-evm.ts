@@ -19,13 +19,14 @@ export const CHAINS: Record<string, EVMChainConfig> = {
   'localhost': { name: 'Local', rpcUrl: 'http://127.0.0.1:8545', chainId: 31337 },
 };
 
-// Minimal ABI for SoulRegistry contract
+// Minimal ABI for SoulRegistry contract — matches actual Solidity types
 const SOUL_REGISTRY_ABI = [
-  'function registerSoul() external returns (bool)',
-  'function writeDocument(uint8 docType, string contentHash, string encryptedHash, string cid, string signature) external',
-  'function getLatestDocument(address soul, uint8 docType) external view returns (tuple(uint8 docType, string contentHash, string encryptedHash, string cid, string signature, uint256 version, uint256 timestamp))',
-  'function getDocumentAt(address soul, uint8 docType, uint256 version) external view returns (tuple(uint8 docType, string contentHash, string encryptedHash, string cid, string signature, uint256 version, uint256 timestamp))',
-  'function getDocumentCount(address soul, uint8 docType) external view returns (uint256)',
+  'function registerSoul() external',
+  'function writeDocument(uint8 docType, bytes32 contentHash, bytes32 encryptedHash, string storageCid, bytes signature) external',
+  'function latestDocument(address agent, uint8 docType) external view returns (tuple(bytes32 contentHash, bytes32 encryptedHash, string storageCid, uint8 docType, uint64 timestamp, uint32 version, bytes32 prevHash, bytes signature))',
+  'function documentAt(address agent, uint8 docType, uint32 version) external view returns (tuple(bytes32 contentHash, bytes32 encryptedHash, string storageCid, uint8 docType, uint64 timestamp, uint32 version, bytes32 prevHash, bytes signature))',
+  'function documentCount(address agent, uint8 docType) external view returns (uint32)',
+  'function verifyDocument(address agent, uint8 docType, uint32 version, bytes32 expectedHash) external view returns (bool)',
   'function grantAccess(address reader, uint8 docType) external',
   'function revokeAccess(address reader, uint8 docType) external',
 ];
@@ -39,6 +40,7 @@ export class EVMChainProvider implements ChainProvider {
   private provider: any;
   private wallet: any;
   private contract: any;
+  private _address: string = '';
 
   constructor(chainNameOrConfig: string | EVMChainConfig, privateKey?: string) {
     if (typeof chainNameOrConfig === 'string') {
@@ -62,20 +64,34 @@ export class EVMChainProvider implements ChainProvider {
 
     const { ethers } = await import(/* webpackIgnore: true */ 'ethers' as string);
     this.provider = new ethers.JsonRpcProvider(this.config.rpcUrl);
-    this.wallet = new ethers.Wallet(this.config.privateKey, this.provider);
+    const baseWallet = new ethers.Wallet(this.config.privateKey, this.provider);
+    // Wrap in NonceManager to handle concurrent/sequential tx nonces correctly
+    this.wallet = new ethers.NonceManager(baseWallet);
+    this._address = baseWallet.address;
     this.contract = new ethers.Contract(this.config.contractAddress, SOUL_REGISTRY_ABI, this.wallet);
   }
 
   private toEntry(raw: any): DocumentEntry {
     return {
       docType: Number(raw.docType),
-      contentHash: raw.contentHash,
-      encryptedHash: raw.encryptedHash,
-      cid: raw.cid,
-      signature: raw.signature,
+      contentHash: raw.contentHash, // bytes32 hex string
+      encryptedHash: raw.encryptedHash, // bytes32 hex string
+      cid: raw.storageCid ?? raw.cid ?? '',
+      signature: raw.signature, // bytes hex string
       version: Number(raw.version),
       timestamp: Number(raw.timestamp),
     };
+  }
+
+  /** Pad a hex string or plain string to bytes32 */
+  private toBytes32(value: string): string {
+    // If already 66 chars (0x + 64 hex), return as-is
+    if (value.startsWith('0x') && value.length === 66) return value;
+    // If hex string without 0x prefix
+    if (/^[0-9a-fA-F]{64}$/.test(value)) return '0x' + value;
+    // Otherwise, treat as UTF-8 and pad to 32 bytes
+    const { ethers } = require('ethers');
+    return ethers.encodeBytes32String ? ethers.encodeBytes32String(value.slice(0, 31)) : ethers.zeroPadBytes(ethers.toUtf8Bytes(value.slice(0, 32)), 32);
   }
 
   async registerSoul(): Promise<string> {
@@ -87,7 +103,11 @@ export class EVMChainProvider implements ChainProvider {
 
   async writeDocument(docType: number, contentHash: string, encryptedHash: string, cid: string, signature: string): Promise<string> {
     await this.init();
-    const tx = await this.contract.writeDocument(docType, contentHash, encryptedHash, cid, signature);
+    const contentBytes32 = this.toBytes32(contentHash);
+    const encryptedBytes32 = this.toBytes32(encryptedHash);
+    // signature as bytes
+    const sigBytes = signature.startsWith('0x') ? signature : '0x' + (signature || '00');
+    const tx = await this.contract.writeDocument(docType, contentBytes32, encryptedBytes32, cid, sigBytes);
     const receipt = await tx.wait();
     return receipt.hash;
   }
@@ -95,8 +115,8 @@ export class EVMChainProvider implements ChainProvider {
   async latestDocument(docType: number): Promise<DocumentEntry | null> {
     await this.init();
     try {
-      const raw = await this.contract.getLatestDocument(this.wallet.address, docType);
-      if (!raw.contentHash) return null;
+      const raw = await this.contract.latestDocument(this._address, docType);
+      if (!raw.contentHash || raw.contentHash === '0x' + '0'.repeat(64)) return null;
       return this.toEntry(raw);
     } catch {
       return null;
@@ -106,8 +126,8 @@ export class EVMChainProvider implements ChainProvider {
   async documentAt(docType: number, version: number): Promise<DocumentEntry | null> {
     await this.init();
     try {
-      const raw = await this.contract.getDocumentAt(this.wallet.address, docType, version);
-      if (!raw.contentHash) return null;
+      const raw = await this.contract.documentAt(this._address, docType, version);
+      if (!raw.contentHash || raw.contentHash === '0x' + '0'.repeat(64)) return null;
       return this.toEntry(raw);
     } catch {
       return null;
@@ -116,14 +136,18 @@ export class EVMChainProvider implements ChainProvider {
 
   async documentCount(docType: number): Promise<number> {
     await this.init();
-    const count = await this.contract.getDocumentCount(this.wallet.address, docType);
+    const count = await this.contract.documentCount(this._address, docType);
     return Number(count);
   }
 
   async verifyDocument(docType: number, version: number, expectedHash: string): Promise<boolean> {
-    const doc = await this.documentAt(docType, version);
-    if (!doc) return false;
-    return doc.contentHash === expectedHash;
+    await this.init();
+    try {
+      const expectedBytes32 = this.toBytes32(expectedHash);
+      return await this.contract.verifyDocument(this._address, docType, version, expectedBytes32);
+    } catch {
+      return false;
+    }
   }
 
   async grantAccess(reader: string, docType: number): Promise<string> {
