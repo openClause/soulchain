@@ -1,4 +1,4 @@
 
-> @openclaused/cli@0.1.0 build /home/paul/.openclaw/workspace/soulchain/packages/cli
+> @openclaused/cli@0.6.0 build /home/paul/.openclaw/workspace/soulchain/packages/cli
 > tsc
 

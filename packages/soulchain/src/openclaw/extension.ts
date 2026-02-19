@@ -20,6 +20,7 @@ let hook: SoulchainHook | null = null;
 let watcher: FileWatcher | null = null;
 let engine: SyncEngine | null = null;
 let cacheManager: CacheManager | null = null;
+let selfHostedChain: any = null;
 
 export async function activate(workspaceDir: string, passphrase?: string): Promise<void> {
   // 1. Load config
@@ -43,16 +44,16 @@ export async function activate(workspaceDir: string, passphrase?: string): Promi
   if (typeof chainConfig === 'object' && chainConfig.type === 'self-hosted') {
     const { SelfHostedChain, ANVIL_PRIVATE_KEY } = await import('../core/sync/self-hosted');
     const { EVMChainProvider } = await import('../core/sync/chain-evm');
-    const selfHosted = new SelfHostedChain({
+    selfHostedChain = new SelfHostedChain({
       dataDir: chainConfig.dataDir ?? path.join(workspaceDir, '.soulchain'),
       port: chainConfig.port ?? 8545,
       engine: chainConfig.engine ?? 'anvil',
     });
-    await selfHosted.start();
-    const contractAddress = chainConfig.contractAddress ?? await selfHosted.ensureContract();
+    await selfHostedChain.start();
+    const contractAddress = chainConfig.contractAddress ?? await selfHostedChain.ensureContract();
     chain = new EVMChainProvider({
       name: 'Self-hosted',
-      rpcUrl: selfHosted.getRpcUrl(),
+      rpcUrl: selfHostedChain.getRpcUrl(),
       chainId: 31337,
       contractAddress,
       privateKey: ANVIL_PRIVATE_KEY,
@@ -60,16 +61,16 @@ export async function activate(workspaceDir: string, passphrase?: string): Promi
   } else if (chainConfig === 'self-hosted') {
     const { SelfHostedChain, ANVIL_PRIVATE_KEY } = await import('../core/sync/self-hosted');
     const { EVMChainProvider } = await import('../core/sync/chain-evm');
-    const selfHosted = new SelfHostedChain({
+    selfHostedChain = new SelfHostedChain({
       dataDir: path.join(workspaceDir, '.soulchain'),
       port: 8545,
       engine: 'anvil',
     });
-    await selfHosted.start();
-    const contractAddress = await selfHosted.ensureContract();
+    await selfHostedChain.start();
+    const contractAddress = await selfHostedChain.ensureContract();
     chain = new EVMChainProvider({
       name: 'Self-hosted',
-      rpcUrl: selfHosted.getRpcUrl(),
+      rpcUrl: selfHostedChain.getRpcUrl(),
       chainId: 31337,
       contractAddress,
       privateKey: ANVIL_PRIVATE_KEY,
@@ -129,6 +130,10 @@ export async function deactivate(): Promise<void> {
   if (hook) {
     hook.uninstall();
     hook = null;
+  }
+  if (selfHostedChain) {
+    await selfHostedChain.stop();
+    selfHostedChain = null;
   }
   engine = null;
   console.log('[soulchain] Extension deactivated');

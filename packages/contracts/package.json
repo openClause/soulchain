@@ -1,6 +1,6 @@
 {
   "name": "@soulchain/contracts",
-  "version": "0.1.0",
+  "version": "0.6.0",
   "private": true,
   "scripts": {
     "build": "hardhat compile",
