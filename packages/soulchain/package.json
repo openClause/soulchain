@@ -1,6 +1,6 @@
 {
   "name": "@openclaused/soulchain",
-  "version": "0.6.3",
+  "version": "0.7.0",
   "description": "SoulChain — sovereign identity anchored on-chain. Unified package combining core crypto, OpenClaw integration, CLI, and dashboard.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -27,7 +27,8 @@
     "./dashboard": {
       "types": "./dist/dashboard/index.d.ts",
       "default": "./dist/dashboard/index.js"
-    }
+    },
+    "./preload": "./dist/preload.js"
   },
   "files": [
     "dist",

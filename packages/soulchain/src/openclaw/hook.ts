@@ -306,6 +306,13 @@ export class SoulchainHook {
     const relativePath = this.trackedRelative.get(resolved)!;
     const buf = Buffer.isBuffer(data) ? data : Buffer.from(String(data));
 
+    // Update flat cache for preload early hooks
+    try {
+      const cacheDir = path.join(this.workspaceDir, '.soulchain', 'cache');
+      if (!fs.existsSync(cacheDir)) fs.mkdirSync(cacheDir, { recursive: true });
+      this.originalWriteFileSync.call(fs, path.join(cacheDir, relativePath.replace(/\//g, '__')), buf);
+    } catch { /* best effort */ }
+
     // Fire and forget — sync to chain + update cache
     this.engine.onFileWrite(relativePath, buf).then(() => {
       if (this.cache) {

@@ -97,6 +97,10 @@ export async function activate(workspaceDir: string, passphrase?: string): Promi
         const dir = path.dirname(fullPath);
         if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
         fs.writeFileSync(fullPath, restored);
+        // Write to preload cache (flat file for --require early hooks)
+        const cacheDir = path.join(workspaceDir, '.soulchain', 'cache');
+        if (!fs.existsSync(cacheDir)) fs.mkdirSync(cacheDir, { recursive: true });
+        fs.writeFileSync(path.join(cacheDir, trackedPath.replace(/\//g, '__')), restored);
         // Update cache metadata
         const hash = sha256(restored);
         cacheManager.update(trackedPath, hash, 0);
