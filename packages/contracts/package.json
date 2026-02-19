@@ -1,0 +1,21 @@
+{
+  "name": "@soulchain/contracts",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build": "hardhat compile",
+    "test": "hardhat test",
+    "deploy:local": "hardhat run scripts/deploy.ts --network localhost",
+    "deploy:base-sepolia": "hardhat run scripts/deploy.ts --network base-sepolia",
+    "deploy:base": "hardhat run scripts/deploy.ts --network base",
+    "verify": "hardhat run scripts/verify.ts"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "dotenv": "^16.4.0",
+    "hardhat": "^2.22.0",
+    "typescript": "^5.7.0",
+    "ts-node": "^10.9.0",
+    "@types/node": "^22.0.0"
+  }
+}

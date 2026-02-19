@@ -1,0 +1,19 @@
+{
+  "name": "soulchain",
+  "private": true,
+  "scripts": {
+    "build": "turbo run build",
+    "test": "turbo run test"
+  },
+  "devDependencies": {
+    "turbo": "^2.4.0",
+    "typescript": "^5.7.0"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "argon2",
+      "esbuild",
+      "better-sqlite3"
+    ]
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "_format": "hh-sol-cache-2",
+  "files": {
+    "/home/paul/.openclaw/workspace/projects/soulchain/packages/contracts/contracts/SoulRegistry.sol": {
+      "lastModificationDate": 1771463401991,
+      "contentHash": "782a21b1ef4c21be22749519e777d4ad",
+      "sourceName": "contracts/SoulRegistry.sol",
+      "solcConfig": {
+        "version": "0.8.20",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "SoulRegistry"
+      ]
+    }
+  }
+}
