@@ -2,6 +2,5 @@
 > @soulchain/contracts@0.1.0 build /home/paul/.openclaw/workspace/soulchain/packages/contracts
 > hardhat compile
 
-Generating typings for: 1 artifacts in dir: typechain-types for target: ethers-v6
-Successfully generated 6 typings!
-Compiled 1 Solidity file successfully (evm target: paris).
+Nothing to compile
+No need to generate any newer typings.
