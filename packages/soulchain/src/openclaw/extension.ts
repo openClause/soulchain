@@ -84,6 +84,7 @@ export async function activate(workspaceDir: string, passphrase?: string): Promi
     : createStorageAdapter(config);
   const cryptoProvider = createCryptoProvider(keypair);
   engine = new SyncEngine(config, cryptoProvider, storage, chain);
+  engine.setWorkspaceDir(workspaceDir);
 
   // 4. Blockchain-native startup: restore ALL tracked files from chain
   cacheManager = new CacheManager(path.join(workspaceDir, '.soulchain'));

@@ -55,12 +55,17 @@ export class SyncEngine {
   private lastSync: string | null = null;
   private pendingCount = 0;
   private running = false;
+  private _workspaceDir: string | null = null;
 
   constructor(config: SoulchainConfig, crypto: CryptoProvider, storage: StorageAdapter, chain: ChainProvider) {
     this.config = config;
     this.crypto = crypto;
     this.storage = storage;
     this.chain = chain;
+  }
+
+  setWorkspaceDir(dir: string): void {
+    this._workspaceDir = dir;
   }
 
   async onFileWrite(path: string, content: Buffer): Promise<void> {
@@ -90,21 +95,22 @@ export class SyncEngine {
 
     for (const trackedPath of this.config.trackedPaths) {
       const docType = pathToDocType(trackedPath);
+      const fullPath = this._workspaceDir ? join(this._workspaceDir, trackedPath) : trackedPath;
       const chainDoc = await this.chain.latestDocument(docType);
 
       if (!chainDoc) {
-        if (existsSync(trackedPath)) {
+        if (existsSync(fullPath)) {
           report.untracked.push(trackedPath);
         }
         continue;
       }
 
-      if (!existsSync(trackedPath)) {
+      if (!existsSync(fullPath)) {
         report.missing.push(trackedPath);
         continue;
       }
 
-      const localHash = sha256(readFileSync(trackedPath));
+      const localHash = sha256(readFileSync(fullPath));
       if (localHash === chainDoc.contentHash) {
         report.verified++;
       } else {
