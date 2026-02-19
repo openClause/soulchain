@@ -112,6 +112,20 @@ export class SelfHostedChain {
 
     const { engine, port, dataDir } = this.config;
 
+    // Check if port is already in use (another Anvil instance)
+    try {
+      const res = await fetch(`http://127.0.0.1:${port}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ jsonrpc: '2.0', method: 'eth_blockNumber', params: [], id: 1 }),
+      });
+      if (res.ok) {
+        this._running = true;
+        console.log(`[soulchain] Anvil already running on port ${port}`);
+        return;
+      }
+    } catch {} // not running, proceed to spawn
+
     // Ensure data dir exists
     if (!existsSync(dataDir)) mkdirSync(dataDir, { recursive: true });
 

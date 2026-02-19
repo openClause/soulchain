@@ -1,6 +1,6 @@
 {
   "name": "@openclaused/openclaw",
-  "version": "0.6.3",
+  "version": "0.6.4",
   "description": "OpenClaw integration for SoulChain — automatic file sync hooks and workspace management",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

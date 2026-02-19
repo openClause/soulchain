@@ -124,7 +124,8 @@ export class SyncEngine {
       }
 
       const localHash = sha256(readFileSync(fullPath));
-      if (localHash === chainDoc.contentHash) {
+      const normalize = (h: string) => h.replace(/^0x/, '');
+      if (normalize(localHash) === normalize(chainDoc.contentHash)) {
         report.verified++;
       } else {
         report.tampered.push(trackedPath);
@@ -265,9 +266,26 @@ export class SyncEngine {
 
   /**
    * Register a child agent under the current agent.
+   * 
+   * **Important:** The child must have already called `registerSoul()` on the contract
+   * before they can be registered as a child. If the child is not yet registered,
+   * this will throw an error.
+   * 
+   * @param childAddress - The Ethereum address of the child agent
+   * @throws Error if the child has not called registerSoul() first
    */
   async registerChild(childAddress: string): Promise<string> {
-    return this.chain.registerChild(childAddress);
+    try {
+      return await this.chain.registerChild(childAddress);
+    } catch (err: any) {
+      if (err.message?.includes('revert') || err.reason) {
+        throw new Error(
+          `Failed to register child ${childAddress}. ` +
+          `Child must call registerSoul() first before being registered as a child.`
+        );
+      }
+      throw err;
+    }
   }
 
   /**

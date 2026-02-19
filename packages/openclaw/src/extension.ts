@@ -48,7 +48,9 @@ export async function activate(workspaceDir: string, passphrase?: string): Promi
       port: chainConfig.port ?? 8545,
       engine: chainConfig.engine ?? 'anvil',
     });
-    await selfHostedChain.start();
+    if (chainConfig.autoStart !== false) {
+      await selfHostedChain.start();
+    }
     const contractAddress = chainConfig.contractAddress ?? await selfHostedChain.ensureContract();
     chain = new EVMChainProvider({
       name: 'Self-hosted',

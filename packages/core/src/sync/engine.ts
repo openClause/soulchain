@@ -105,7 +105,8 @@ export class SyncEngine {
       }
 
       const localHash = sha256(readFileSync(trackedPath));
-      if (localHash === chainDoc.contentHash) {
+      const normalize = (h: string) => h.replace(/^0x/, '');
+      if (normalize(localHash) === normalize(chainDoc.contentHash)) {
         report.verified++;
       } else {
         report.tampered.push(trackedPath);
