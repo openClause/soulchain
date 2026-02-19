@@ -1,10 +1,46 @@
 import { createHash, randomBytes } from 'crypto';
+import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'fs';
+import { join, dirname } from 'path';
 import type { ChainProvider, DocumentEntry } from './chain';
 
 export class MockChainProvider implements ChainProvider {
   private documents = new Map<number, DocumentEntry[]>();
   private accessGrants = new Map<string, Set<number>>();
   private registered = false;
+  private persistPath: string | null = null;
+
+  constructor(persistDir?: string) {
+    if (persistDir) {
+      this.persistPath = join(persistDir, '.soulchain', 'mock-chain.json');
+      this.loadFromDisk();
+    }
+  }
+
+  private loadFromDisk(): void {
+    if (!this.persistPath || !existsSync(this.persistPath)) return;
+    try {
+      const data = JSON.parse(readFileSync(this.persistPath, 'utf-8'));
+      if (data.documents) {
+        for (const [key, docs] of Object.entries(data.documents)) {
+          this.documents.set(Number(key), docs as DocumentEntry[]);
+        }
+      }
+      this.registered = data.registered ?? false;
+    } catch {}
+  }
+
+  private saveToDisk(): void {
+    if (!this.persistPath) return;
+    try {
+      const dir = dirname(this.persistPath);
+      if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
+      const obj: any = { registered: this.registered, documents: {} };
+      for (const [key, docs] of this.documents.entries()) {
+        obj.documents[String(key)] = docs;
+      }
+      writeFileSync(this.persistPath, JSON.stringify(obj, null, 2));
+    } catch {}
+  }
 
   private txHash(): string {
     return '0x' + randomBytes(32).toString('hex');
@@ -12,6 +48,7 @@ export class MockChainProvider implements ChainProvider {
 
   async registerSoul(): Promise<string> {
     this.registered = true;
+    this.saveToDisk();
     return this.txHash();
   }
 
@@ -28,6 +65,7 @@ export class MockChainProvider implements ChainProvider {
     };
     docs.push(entry);
     this.documents.set(docType, docs);
+    this.saveToDisk();
     return this.txHash();
   }
 

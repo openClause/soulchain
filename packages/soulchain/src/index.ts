@@ -28,7 +28,7 @@ export type {
 // OpenClaw integration exports
 export {
   SoulchainHook, FileWatcher, verifyOnStartup, initSoulchain,
-  activate, deactivate, getEngine, getCacheManager, createCryptoProvider,
+  activate, deactivate, getEngine, createCryptoProvider,
   CacheManager,
 } from './openclaw/index';
 

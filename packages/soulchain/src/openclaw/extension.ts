@@ -4,6 +4,8 @@ import {
   createStorageAdapter,
   MockChainProvider,
   SyncEngine,
+  sha256,
+  MockStorageAdapter,
 } from '../core/index';
 import type { Keypair } from '../core/index';
 import * as fs from 'fs';
@@ -31,71 +33,53 @@ export async function activate(workspaceDir: string, passphrase?: string): Promi
 
   const keypair: Keypair = {
     secretKey: new Uint8Array(secretKey),
-    publicKey: new Uint8Array(secretKey.slice(32)),
+    publicKey: new Uint8Array(secretKey.slice(32)), // Ed25519: last 32 bytes of 64-byte secret = public
   };
 
   // 3. Create engine
-  const chain = new MockChainProvider(); // TODO: real chain based on config
-  const storage = createStorageAdapter(config);
+  const chain = new MockChainProvider(workspaceDir); // Persists to .soulchain/mock-chain.json
+  // For mock storage, pass workspaceDir so blobs persist to disk
+  const storage = config.storage === 'mock'
+    ? new MockStorageAdapter(workspaceDir)
+    : createStorageAdapter(config);
   const cryptoProvider = createCryptoProvider(keypair);
   engine = new SyncEngine(config, cryptoProvider, storage, chain);
 
-  // 4. Create cache manager
-  cacheManager = new CacheManager(workspaceDir);
-
-  // 5. Install hooks (with cache)
-  hook = new SoulchainHook(engine, workspaceDir, config.trackedPaths);
-  hook.setCache(cacheManager);
-  hook.install();
-
-  // 6. Startup restore — pull all tracked files from chain
-  await restoreAllFromChain(workspaceDir, config.trackedPaths);
-
-  // 7. Start watcher
-  watcher = new FileWatcher(config, engine);
-  watcher.start();
-
-  // 8. Verify
-  await verifyOnStartup(engine, config);
-
-  console.log('[soulchain] ✅ Extension activated (blockchain-native mode)');
-}
-
-/**
- * Startup restore: for every tracked file, pull latest from chain → decrypt → write to local disk.
- * This ensures local files are always a fresh cache of chain state.
- */
-async function restoreAllFromChain(workspaceDir: string, trackedPaths: string[]): Promise<void> {
-  if (!engine || !cacheManager) return;
-
-  let restored = 0;
-  for (const relativePath of trackedPaths) {
+  // 4. Blockchain-native startup: restore ALL tracked files from chain
+  cacheManager = new CacheManager(path.join(workspaceDir, '.soulchain'));
+  for (const trackedPath of config.trackedPaths) {
+    const fullPath = path.resolve(workspaceDir, trackedPath);
     try {
-      const content = await engine.restoreFile(relativePath);
-      const absolutePath = path.resolve(workspaceDir, relativePath);
-
-      // Ensure directory exists
-      const dir = path.dirname(absolutePath);
-      if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-
-      // Write to local cache (use raw fs to avoid triggering write hooks)
-      fs.writeFileSync(absolutePath, content);
-
-      // Update cache metadata
-      const { sha256 } = require('../core/utils/hash');
-      const hash = sha256(content);
-      const version = await engine.getLatestVersion(relativePath);
-      cacheManager.update(relativePath, hash, version);
-
-      restored++;
-    } catch {
-      // No chain record yet — that's fine for first run
+      const restored = await engine.restoreFile(trackedPath);
+      if (restored) {
+        // Ensure parent directory exists
+        const dir = path.dirname(fullPath);
+        if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+        fs.writeFileSync(fullPath, restored);
+        // Update cache metadata
+        const hash = sha256(restored);
+        cacheManager.update(trackedPath, hash, 0);
+      }
+    } catch (e: any) {
+      // No chain record yet — file hasn't been synced before, that's fine
+      if (!e.message?.includes('No chain record')) {
+        console.error(`[soulchain] Failed to restore ${trackedPath}:`, e.message);
+      }
     }
   }
 
-  if (restored > 0) {
-    console.log(`[soulchain] 🔄 Restored ${restored} file(s) from chain`);
-  }
+  // 5. Install hooks
+  hook = new SoulchainHook(engine, workspaceDir, config.trackedPaths);
+  hook.install();
+
+  // 6. Start watcher
+  watcher = new FileWatcher(config, engine);
+  watcher.start();
+
+  // 7. Verify
+  await verifyOnStartup(engine, config);
+
+  console.log('[soulchain] ✅ Extension activated (blockchain-native mode)');
 }
 
 export async function deactivate(): Promise<void> {
@@ -108,14 +92,9 @@ export async function deactivate(): Promise<void> {
     hook = null;
   }
   engine = null;
-  cacheManager = null;
   console.log('[soulchain] Extension deactivated');
 }
 
 export function getEngine(): SyncEngine | null {
   return engine;
-}
-
-export function getCacheManager(): CacheManager | null {
-  return cacheManager;
 }
