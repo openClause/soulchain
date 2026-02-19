@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.verifyCommand = void 0;
 const commander_1 = require("commander");
-const openclaw_1 = require("@soulchain/openclaw");
+const openclaw_1 = require("@openclaused/openclaw");
 const branding_1 = require("../branding");
 exports.verifyCommand = new commander_1.Command('verify')
     .description('Verify all files against chain')

@@ -36,6 +36,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.SoulchainHook = void 0;
 const fs = __importStar(require("fs"));
 const path = __importStar(require("path"));
+// Get the mutable CommonJS fs module for monkey-patching (import * creates frozen namespace)
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const mutableFs = require('fs');
 class SoulchainHook {
     engine;
     trackedPaths;
@@ -58,12 +61,12 @@ class SoulchainHook {
         const origAsync = this.originalWriteFile;
         const origPromises = this.originalPromisesWriteFile;
         // Patch writeFileSync
-        fs.writeFileSync = function patchedWriteFileSync(file, data, options) {
+        mutableFs.writeFileSync = function patchedWriteFileSync(file, data, options) {
             origSync.call(fs, file, data, options);
             self.maybeIntercept(file, data);
         };
         // Patch writeFile (callback)
-        fs.writeFile = function patchedWriteFile(file, data, optionsOrCb, cb) {
+        mutableFs.writeFile = function patchedWriteFile(file, data, optionsOrCb, cb) {
             const callback = typeof optionsOrCb === 'function' ? optionsOrCb : cb;
             const options = typeof optionsOrCb === 'function' ? undefined : optionsOrCb;
             const args = [file, data];
@@ -78,7 +81,7 @@ class SoulchainHook {
             origAsync.apply(fs, args);
         };
         // Patch promises.writeFile
-        fs.promises.writeFile = async function patchedPromisesWriteFile(file, data, options) {
+        mutableFs.promises.writeFile = async function patchedPromisesWriteFile(file, data, options) {
             await origPromises.call(fs.promises, file, data, options);
             self.maybeIntercept(file, data);
         };
@@ -87,9 +90,9 @@ class SoulchainHook {
     uninstall() {
         if (!this.installed)
             return;
-        fs.writeFileSync = this.originalWriteFileSync;
-        fs.writeFile = this.originalWriteFile;
-        fs.promises.writeFile = this.originalPromisesWriteFile;
+        mutableFs.writeFileSync = this.originalWriteFileSync;
+        mutableFs.writeFile = this.originalWriteFile;
+        mutableFs.promises.writeFile = this.originalPromisesWriteFile;
         this.installed = false;
     }
     maybeIntercept(file, data) {

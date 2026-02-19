@@ -1,0 +1,17 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.createCryptoProvider = exports.getEngine = exports.deactivate = exports.activate = exports.initSoulchain = exports.verifyOnStartup = exports.FileWatcher = exports.SoulchainHook = void 0;
+var hook_1 = require("./hook");
+Object.defineProperty(exports, "SoulchainHook", { enumerable: true, get: function () { return hook_1.SoulchainHook; } });
+var watcher_1 = require("./watcher");
+Object.defineProperty(exports, "FileWatcher", { enumerable: true, get: function () { return watcher_1.FileWatcher; } });
+var verify_1 = require("./verify");
+Object.defineProperty(exports, "verifyOnStartup", { enumerable: true, get: function () { return verify_1.verifyOnStartup; } });
+var init_1 = require("./init");
+Object.defineProperty(exports, "initSoulchain", { enumerable: true, get: function () { return init_1.initSoulchain; } });
+var extension_1 = require("./extension");
+Object.defineProperty(exports, "activate", { enumerable: true, get: function () { return extension_1.activate; } });
+Object.defineProperty(exports, "deactivate", { enumerable: true, get: function () { return extension_1.deactivate; } });
+Object.defineProperty(exports, "getEngine", { enumerable: true, get: function () { return extension_1.getEngine; } });
+var crypto_provider_1 = require("./crypto-provider");
+Object.defineProperty(exports, "createCryptoProvider", { enumerable: true, get: function () { return crypto_provider_1.createCryptoProvider; } });

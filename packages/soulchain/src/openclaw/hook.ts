@@ -1,5 +1,9 @@
 import * as fs from 'fs';
 import * as path from 'path';
+
+// Get the mutable CommonJS fs module for monkey-patching (import * creates frozen namespace)
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const mutableFs: any = require('fs');
 import type { SyncEngine } from '../core/index';
 
 export class SoulchainHook {
@@ -27,8 +31,8 @@ export class SoulchainHook {
     const origAsync = this.originalWriteFile;
     const origPromises = this.originalPromisesWriteFile;
 
-    // Patch writeFileSync
-    (fs as any).writeFileSync = function patchedWriteFileSync(
+    // Patch writeFileSync (use mutableFs to bypass frozen namespace)
+    mutableFs.writeFileSync = function patchedWriteFileSync(
       file: fs.PathOrFileDescriptor,
       data: any,
       options?: fs.WriteFileOptions
@@ -38,7 +42,7 @@ export class SoulchainHook {
     };
 
     // Patch writeFile (callback)
-    (fs as any).writeFile = function patchedWriteFile(
+    mutableFs.writeFile = function patchedWriteFile(
       file: fs.PathOrFileDescriptor,
       data: any,
       optionsOrCb: any,
@@ -57,7 +61,7 @@ export class SoulchainHook {
     };
 
     // Patch promises.writeFile
-    (fs.promises as any).writeFile = async function patchedPromisesWriteFile(
+    mutableFs.promises.writeFile = async function patchedPromisesWriteFile(
       file: fs.PathLike | fs.promises.FileHandle,
       data: any,
       options?: any
@@ -71,9 +75,9 @@ export class SoulchainHook {
 
   uninstall(): void {
     if (!this.installed) return;
-    (fs as any).writeFileSync = this.originalWriteFileSync;
-    (fs as any).writeFile = this.originalWriteFile;
-    (fs.promises as any).writeFile = this.originalPromisesWriteFile;
+    mutableFs.writeFileSync = this.originalWriteFileSync;
+    mutableFs.writeFile = this.originalWriteFile;
+    mutableFs.promises.writeFile = this.originalPromisesWriteFile;
     this.installed = false;
   }
 

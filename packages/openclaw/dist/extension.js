@@ -36,7 +36,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.activate = activate;
 exports.deactivate = deactivate;
 exports.getEngine = getEngine;
-const core_1 = require("@soulchain/core");
+const core_1 = require("@openclaused/core");
 const fs = __importStar(require("fs"));
 const path = __importStar(require("path"));
 const hook_1 = require("./hook");

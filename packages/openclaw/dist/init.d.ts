@@ -1,4 +1,4 @@
-import type { ChainConfig, MigrationReport } from '@soulchain/core';
+import type { ChainConfig, MigrationReport } from '@openclaused/core';
 export interface InitOptions {
     chain: string | ChainConfig;
     storage: 'ipfs' | 'arweave' | 'mock';

@@ -1,6 +1,6 @@
 {
   "name": "@openclaused/soulchain",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "SoulChain — sovereign identity anchored on-chain. Unified package combining core crypto, OpenClaw integration, CLI, and dashboard.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -29,14 +29,24 @@
       "default": "./dist/dashboard/index.js"
     }
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/openClause/soulchain",
     "directory": "packages/soulchain"
   },
-  "keywords": ["blockchain", "identity", "evm", "encryption", "soulchain", "ai-agent", "openclaw"],
+  "keywords": [
+    "blockchain",
+    "identity",
+    "evm",
+    "encryption",
+    "soulchain",
+    "ai-agent",
+    "openclaw"
+  ],
   "scripts": {
     "build": "tsc"
   },
@@ -52,7 +62,9 @@
     "ethers": "^6.0.0"
   },
   "peerDependenciesMeta": {
-    "ethers": { "optional": true }
+    "ethers": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "@types/better-sqlite3": "^7.6.13",

@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.historyCommand = void 0;
 const commander_1 = require("commander");
-const core_1 = require("@soulchain/core");
+const core_1 = require("@openclaused/core");
 const branding_1 = require("../branding");
 exports.historyCommand = new commander_1.Command('history')
     .description('Show version history for a file')

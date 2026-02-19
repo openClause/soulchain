@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createCryptoProvider = createCryptoProvider;
-const core_1 = require("@soulchain/core");
+const core_1 = require("@openclaused/core");
 function createCryptoProvider(keypair) {
     return {
         encrypt(data) {

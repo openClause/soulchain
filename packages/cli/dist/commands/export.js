@@ -37,7 +37,7 @@ exports.exportCommand = void 0;
 const commander_1 = require("commander");
 const fs = __importStar(require("fs"));
 const path = __importStar(require("path"));
-const core_1 = require("@soulchain/core");
+const core_1 = require("@openclaused/core");
 const branding_1 = require("../branding");
 exports.exportCommand = new commander_1.Command('export')
     .description('Export entire soul as encrypted bundle')

@@ -37,7 +37,7 @@ exports.restoreCommand = void 0;
 const commander_1 = require("commander");
 const fs = __importStar(require("fs"));
 const path = __importStar(require("path"));
-const openclaw_1 = require("@soulchain/openclaw");
+const openclaw_1 = require("@openclaused/openclaw");
 const branding_1 = require("../branding");
 exports.restoreCommand = new commander_1.Command('restore')
     .description('Restore file(s) from chain')

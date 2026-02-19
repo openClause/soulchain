@@ -36,7 +36,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.initSoulchain = initSoulchain;
 const fs = __importStar(require("fs"));
 const path = __importStar(require("path"));
-const core_1 = require("@soulchain/core");
+const core_1 = require("@openclaused/core");
 const crypto_provider_1 = require("./crypto-provider");
 async function initSoulchain(workspaceDir, options) {
     const passphrase = options.passphrase ?? 'soulchain-dev';

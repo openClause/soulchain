@@ -139,7 +139,7 @@ class SelfHostedChain {
         // In a real scenario, this would deploy the contract
         // For now we throw a helpful message
         throw new Error('Contract deployment requires compiled SoulRegistry bytecode. ' +
-            'Run `pnpm --filter @soulchain/contracts build` first, then use the artifact.');
+            'Run `pnpm --filter @openclaused/contracts build` first, then use the artifact.');
     }
 }
 exports.SelfHostedChain = SelfHostedChain;

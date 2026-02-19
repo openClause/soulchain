@@ -1,4 +1,4 @@
-import type { SyncEngine } from '@soulchain/core';
+import type { SyncEngine } from '@openclaused/core';
 export declare class SoulchainHook {
     private engine;
     private trackedPaths;

@@ -1,4 +1,4 @@
-import type { SoulchainConfig, SyncEngine } from '@soulchain/core';
+import type { SoulchainConfig, SyncEngine } from '@openclaused/core';
 export declare class FileWatcher {
     private config;
     private engine;
