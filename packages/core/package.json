@@ -1,17 +1,27 @@
 {
   "name": "@openclaused/core",
-  "version": "0.6.1",
+  "version": "0.6.2",
   "description": "Core library for SoulChain — cryptographic identity anchoring on EVM blockchains",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "files": ["dist", "artifacts"],
+  "files": [
+    "dist",
+    "artifacts"
+  ],
   "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/paulingram/soulchain",
     "directory": "packages/core"
   },
-  "keywords": ["blockchain", "identity", "evm", "encryption", "soulchain", "ai-agent"],
+  "keywords": [
+    "blockchain",
+    "identity",
+    "evm",
+    "encryption",
+    "soulchain",
+    "ai-agent"
+  ],
   "scripts": {
     "build": "tsc",
     "test": "vitest run"
@@ -26,7 +36,9 @@
     "ethers": "^6.0.0"
   },
   "peerDependenciesMeta": {
-    "ethers": { "optional": true }
+    "ethers": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "@types/better-sqlite3": "^7.6.13",

@@ -1,5 +1,5 @@
 
-> @soulchain/contracts@0.6.0 build /home/paul/.openclaw/workspace/soulchain/packages/contracts
+> @soulchain/contracts@0.6.1 build /home/paul/.openclaw/workspace/soulchain/packages/contracts
 > hardhat compile
 
 Nothing to compile

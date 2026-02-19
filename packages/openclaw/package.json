@@ -1,17 +1,25 @@
 {
   "name": "@openclaused/openclaw",
-  "version": "0.6.1",
+  "version": "0.6.2",
   "description": "OpenClaw integration for SoulChain — automatic file sync hooks and workspace management",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/paulingram/soulchain",
     "directory": "packages/openclaw"
   },
-  "keywords": ["soulchain", "openclaw", "ai-agent", "sync", "hooks"],
+  "keywords": [
+    "soulchain",
+    "openclaw",
+    "ai-agent",
+    "sync",
+    "hooks"
+  ],
   "scripts": {
     "build": "tsc",
     "test": "vitest run"

@@ -1,8 +1,14 @@
 {
   "name": "@openclaused/dashboard",
-  "version": "0.6.1",
+  "version": "0.6.2",
   "main": "dist/index.js",
-  "scripts": { "build": "tsc" },
-  "dependencies": { "@openclaused/core": "workspace:*" },
-  "devDependencies": { "typescript": "^5.7.0" }
+  "scripts": {
+    "build": "tsc"
+  },
+  "dependencies": {
+    "@openclaused/core": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.0"
+  }
 }
