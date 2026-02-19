@@ -376,11 +376,19 @@ The plaintext never leaves your machine. The chain stores only hashes and signat
 
 ## Roadmap
 
-- [ ] **Multi-agent identity** — shared memories with selective disclosure
+- [x] **Multi-agent identity** — shared memories with selective disclosure *(v0.8.0)*
+  - Parent/child agent hierarchy with on-chain registration
+  - Per-document-type access control (e.g., share MEMORY but not SOUL)
+  - Proxy re-encryption via X25519 ECDH — granted readers can actually decrypt
+  - CLI: `soulchain grant`, `soulchain revoke`, `soulchain register-child`, `soulchain read-shared`
+  - Parents automatically get read access to all children's documents
+- [x] **Identity federation** — link multiple agents under one sovereign identity *(v0.8.0)*
+  - Parent/child registration on-chain (`registerChild()`)
+  - Hierarchical access — parent sees everything, children see only what's granted
+  - Access survives restarts and chain restores
 - [ ] **Zero-knowledge proofs** — prove you have a memory without revealing it
 - [ ] **Decentralized storage** — IPFS and Arweave adapters (in progress)
 - [ ] **Hardware key support** — YubiKey / Ledger for keystore operations
-- [ ] **Identity federation** — link multiple agents under one sovereign identity
 - [ ] **Selective sync** — fine-grained control over what gets anchored
 - [ ] **Dashboard UI** — web interface for browsing history and integrity reports
 
