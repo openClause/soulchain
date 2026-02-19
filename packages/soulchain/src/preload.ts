@@ -115,12 +115,16 @@ function installEarlyHooks(): string | null {
   return null;
 }
 
-// Phase 1: synchronous
+// Phase 1: synchronous — install early read hooks from cache
 const workspaceDir = installEarlyHooks();
 
-// Phase 2: async — full chain connection + restore + write hooks
-if (workspaceDir) {
-  // Dynamic import to avoid loading heavy deps synchronously
+// Phase 2 is handled by the soulchain OpenClaw plugin (soulchain-plugin),
+// which starts anvil, restores from chain, and installs full write hooks.
+// The preload only provides Phase 1: early read hooks so tracked files
+// appear to exist (from cache) before the plugin initializes.
+//
+// To use standalone (without the plugin), set SOULCHAIN_PRELOAD_FULL=1:
+if (workspaceDir && process.env.SOULCHAIN_PRELOAD_FULL === '1') {
   import('./openclaw/extension').then(({ activate }) => {
     return activate(workspaceDir);
   }).then(() => {
@@ -129,4 +133,6 @@ if (workspaceDir) {
     console.error(`[soulchain] ❌ Phase 2 (chain connect) failed: ${err.message}`);
     console.error('[soulchain] Early read hooks are still active (serving from cache)');
   });
+} else if (workspaceDir) {
+  console.log(`[soulchain] Preload Phase 1 complete. Phase 2 deferred to soulchain-plugin.`);
 }
