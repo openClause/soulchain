@@ -7,6 +7,8 @@ import type { StorageAdapter } from '../storage/types';
 import { encrypt, decrypt, type EncryptedData } from '../crypto/encryption';
 import { sha256 } from '../utils/hash';
 import type { ChainProvider, DocumentEntry } from './chain';
+import { SharedAccessManager, type AccessKey } from '../crypto/shared-access';
+import { deriveDocumentKey } from '../crypto/key-derivation';
 
 export interface CryptoProvider {
   encrypt(data: Buffer): EncryptedData;
@@ -32,6 +34,17 @@ export interface SyncStatus {
   pendingFiles: number;
   lastSync: string | null;
   isRunning: boolean;
+}
+
+export interface AccessGrant {
+  readerAddress: string;
+  docTypes: number[];
+}
+
+export interface AccessMap {
+  grants: AccessGrant[];
+  children: string[];
+  parent: string | null;
 }
 
 // Map document types to numeric IDs for chain
@@ -170,6 +183,117 @@ export class SyncEngine {
     const docType = pathToDocType(filePath);
     const doc = await this.chain.latestDocument(docType);
     return doc ? doc.contentHash : null;
+  }
+
+  /**
+   * Share specific document types with another agent.
+   * Creates re-encrypted access keys so the reader can decrypt.
+   */
+  async shareWith(readerAddress: string, docTypes: string[], readerPublicKey: Buffer, ownerKeypair: { secretKey: Uint8Array }, ownerAddress: string): Promise<void> {
+    const sam = new SharedAccessManager();
+    for (const docTypeName of docTypes) {
+      const docTypeId = DOC_TYPE_MAP[docTypeName.toLowerCase()] ?? 0;
+      
+      // Grant on-chain access
+      await this.chain.grantAccess(readerAddress, docTypeId);
+      
+      // Derive the document's symmetric key (same as used during encryption)
+      const latestDoc = await this.chain.latestDocument(docTypeId);
+      const version = latestDoc ? latestDoc.version : 0;
+      const masterKey = ownerKeypair.secretKey;
+      const docSymKey = deriveDocumentKey(masterKey, docTypeName.toLowerCase(), version);
+      
+      // Create and store re-encrypted access key
+      const accessKey = await sam.createAccessKey(
+        ownerKeypair,
+        readerPublicKey,
+        docTypeId,
+        docSymKey,
+        ownerAddress,
+        readerAddress,
+      );
+      await sam.storeAccessKey(accessKey, this.chain);
+    }
+  }
+
+  /**
+   * Revoke access from a reader for specific document types.
+   */
+  async revokeFrom(readerAddress: string, docTypes: string[]): Promise<void> {
+    for (const docTypeName of docTypes) {
+      const docTypeId = DOC_TYPE_MAP[docTypeName.toLowerCase()] ?? 0;
+      await this.chain.revokeAccess(readerAddress, docTypeId);
+      await this.chain.removeAccessKey(readerAddress, docTypeId);
+    }
+  }
+
+  /**
+   * Read another agent's shared document.
+   */
+  async readShared(
+    ownerAddress: string,
+    docType: string,
+    readerKeypair: { secretKey: Uint8Array },
+    ownerPublicKey: Buffer,
+  ): Promise<Buffer | null> {
+    const docTypeId = DOC_TYPE_MAP[docType.toLowerCase()] ?? 0;
+    const sam = new SharedAccessManager();
+    
+    // Get the document from chain
+    const doc = await this.chain.latestDocumentOf(ownerAddress, docTypeId);
+    if (!doc) return null;
+    
+    // Download encrypted content from storage
+    const encryptedBuf = await this.storage.download(doc.cid);
+    
+    // Get the access key
+    const readerAddress = ''; // Will be derived from keypair
+    const accessKey = await sam.getAccessKey(
+      ownerAddress,
+      readerAddress,
+      docTypeId,
+      this.chain,
+    );
+    
+    if (!accessKey) {
+      throw new Error('Access denied: no access key found');
+    }
+    
+    // Decrypt using shared access
+    return sam.decryptWithAccess(readerKeypair, ownerPublicKey, accessKey, encryptedBuf);
+  }
+
+  /**
+   * Register a child agent under the current agent.
+   */
+  async registerChild(childAddress: string): Promise<string> {
+    return this.chain.registerChild(childAddress);
+  }
+
+  /**
+   * List all access grants, children, and parent.
+   */
+  async listAccess(): Promise<AccessMap> {
+    // This is a simplified implementation - in production you'd query events
+    const children = await this.chain.getChildren('self');
+    const parent = await this.chain.getParent('self');
+    const nullAddr = '0x0000000000000000000000000000000000000000';
+    
+    return {
+      grants: [], // Would need event log querying for full list
+      children,
+      parent: parent === nullAddr ? null : parent,
+    };
+  }
+
+  /** Get the chain provider (for direct access in extensions) */
+  getChain(): ChainProvider {
+    return this.chain;
+  }
+
+  /** Get the storage adapter */
+  getStorage(): StorageAdapter {
+    return this.storage;
   }
 
   status(): SyncStatus {

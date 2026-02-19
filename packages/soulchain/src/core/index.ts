@@ -4,6 +4,8 @@ export { sign, verify } from './crypto/signing';
 export { encrypt, decrypt } from './crypto/encryption';
 export type { EncryptedData } from './crypto/encryption';
 export { deriveDocumentKey } from './crypto/key-derivation';
+export { SharedAccessManager } from './crypto/shared-access';
+export type { AccessKey, SharedKeypair } from './crypto/shared-access';
 export { createKeystore, unlockKeystore } from './crypto/keystore';
 export type { KeystoreData } from './crypto/keystore';
 export { sha256, contentHash } from './utils/hash';
@@ -17,7 +19,7 @@ export type { StorageAdapter, StorageConfig } from './storage';
 
 // Sync
 export { SyncEngine, SyncWorker, SyncQueue, MockChainProvider, BaseChainProvider, BASE_NETWORKS, EVMChainProvider, CHAINS, SelfHostedChain, PublicAnchor, ANVIL_PRIVATE_KEY, createChainProvider } from './sync';
-export type { ChainProvider, DocumentEntry, CryptoProvider, IntegrityReport, MigrationReport, SyncStatus, SyncItem, SyncWorkerConfig, BaseChainConfig, EVMChainConfig, SelfHostedConfig, PublicAnchorConfig } from './sync';
+export type { ChainProvider, DocumentEntry, CryptoProvider, IntegrityReport, MigrationReport, SyncStatus, AccessGrant, AccessMap, SyncItem, SyncWorkerConfig, BaseChainConfig, EVMChainConfig, SelfHostedConfig, PublicAnchorConfig } from './sync';
 
 // Config
 export { loadConfig, DEFAULT_CONFIG } from './config';

@@ -59,14 +59,22 @@ export declare namespace SoulRegistry {
 export interface SoulRegistryInterface extends Interface {
   getFunction(
     nameOrSignature:
+      | "children"
       | "documentAt"
       | "documentCount"
+      | "getAccessKey"
+      | "getChildren"
+      | "getParent"
       | "grantAccess"
       | "hasAccess"
       | "latestDocument"
+      | "parent"
+      | "registerChild"
       | "registerSoul"
       | "registered"
+      | "removeAccessKey"
       | "revokeAccess"
+      | "storeAccessKey"
       | "verifyDocument"
       | "writeDocument"
   ): FunctionFragment;
@@ -74,11 +82,17 @@ export interface SoulRegistryInterface extends Interface {
   getEvent(
     nameOrSignatureOrTopic:
       | "AccessGranted"
+      | "AccessKeyStored"
       | "AccessRevoked"
+      | "ChildRegistered"
       | "DocumentWritten"
       | "SoulRegistered"
   ): EventFragment;
 
+  encodeFunctionData(
+    functionFragment: "children",
+    values: [AddressLike, BigNumberish]
+  ): string;
   encodeFunctionData(
     functionFragment: "documentAt",
     values: [AddressLike, BigNumberish, BigNumberish]
@@ -86,6 +100,18 @@ export interface SoulRegistryInterface extends Interface {
   encodeFunctionData(
     functionFragment: "documentCount",
     values: [AddressLike, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getAccessKey",
+    values: [AddressLike, AddressLike, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getChildren",
+    values: [AddressLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getParent",
+    values: [AddressLike]
   ): string;
   encodeFunctionData(
     functionFragment: "grantAccess",
@@ -99,6 +125,11 @@ export interface SoulRegistryInterface extends Interface {
     functionFragment: "latestDocument",
     values: [AddressLike, BigNumberish]
   ): string;
+  encodeFunctionData(functionFragment: "parent", values: [AddressLike]): string;
+  encodeFunctionData(
+    functionFragment: "registerChild",
+    values: [AddressLike]
+  ): string;
   encodeFunctionData(
     functionFragment: "registerSoul",
     values?: undefined
@@ -108,8 +139,16 @@ export interface SoulRegistryInterface extends Interface {
     values: [AddressLike]
   ): string;
   encodeFunctionData(
+    functionFragment: "removeAccessKey",
+    values: [AddressLike, BigNumberish]
+  ): string;
+  encodeFunctionData(
     functionFragment: "revokeAccess",
     values: [AddressLike, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "storeAccessKey",
+    values: [AddressLike, BigNumberish, BytesLike]
   ): string;
   encodeFunctionData(
     functionFragment: "verifyDocument",
@@ -120,11 +159,21 @@ export interface SoulRegistryInterface extends Interface {
     values: [BigNumberish, BytesLike, BytesLike, string, BytesLike]
   ): string;
 
+  decodeFunctionResult(functionFragment: "children", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "documentAt", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "documentCount",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(
+    functionFragment: "getAccessKey",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getChildren",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "getParent", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "grantAccess",
     data: BytesLike
@@ -134,13 +183,26 @@ export interface SoulRegistryInterface extends Interface {
     functionFragment: "latestDocument",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "parent", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "registerChild",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "registerSoul",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "registered", data: BytesLike): Result;
   decodeFunctionResult(
+    functionFragment: "removeAccessKey",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "revokeAccess",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "storeAccessKey",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -171,6 +233,24 @@ export namespace AccessGrantedEvent {
   export type LogDescription = TypedLogDescription<Event>;
 }
 
+export namespace AccessKeyStoredEvent {
+  export type InputTuple = [
+    owner: AddressLike,
+    reader: AddressLike,
+    docType: BigNumberish
+  ];
+  export type OutputTuple = [owner: string, reader: string, docType: bigint];
+  export interface OutputObject {
+    owner: string;
+    reader: string;
+    docType: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
 export namespace AccessRevokedEvent {
   export type InputTuple = [
     agent: AddressLike,
@@ -182,6 +262,19 @@ export namespace AccessRevokedEvent {
     agent: string;
     reader: string;
     docType: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
+export namespace ChildRegisteredEvent {
+  export type InputTuple = [parent: AddressLike, child: AddressLike];
+  export type OutputTuple = [parent: string, child: string];
+  export interface OutputObject {
+    parent: string;
+    child: string;
   }
   export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
   export type Filter = TypedDeferredTopicFilter<Event>;
@@ -273,6 +366,12 @@ export interface SoulRegistry extends BaseContract {
     event?: TCEvent
   ): Promise<this>;
 
+  children: TypedContractMethod<
+    [arg0: AddressLike, arg1: BigNumberish],
+    [string],
+    "view"
+  >;
+
   documentAt: TypedContractMethod<
     [agent: AddressLike, docType: BigNumberish, version: BigNumberish],
     [SoulRegistry.DocumentEntryStructOutput],
@@ -284,6 +383,16 @@ export interface SoulRegistry extends BaseContract {
     [bigint],
     "view"
   >;
+
+  getAccessKey: TypedContractMethod<
+    [owner: AddressLike, reader: AddressLike, docType: BigNumberish],
+    [string],
+    "view"
+  >;
+
+  getChildren: TypedContractMethod<[agent: AddressLike], [string[]], "view">;
+
+  getParent: TypedContractMethod<[agent: AddressLike], [string], "view">;
 
   grantAccess: TypedContractMethod<
     [reader: AddressLike, docType: BigNumberish],
@@ -303,12 +412,32 @@ export interface SoulRegistry extends BaseContract {
     "view"
   >;
 
+  parent: TypedContractMethod<[arg0: AddressLike], [string], "view">;
+
+  registerChild: TypedContractMethod<
+    [child: AddressLike],
+    [void],
+    "nonpayable"
+  >;
+
   registerSoul: TypedContractMethod<[], [void], "nonpayable">;
 
   registered: TypedContractMethod<[arg0: AddressLike], [boolean], "view">;
 
+  removeAccessKey: TypedContractMethod<
+    [reader: AddressLike, docType: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
+
   revokeAccess: TypedContractMethod<
     [reader: AddressLike, docType: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
+
+  storeAccessKey: TypedContractMethod<
+    [reader: AddressLike, docType: BigNumberish, encryptedKey: BytesLike],
     [void],
     "nonpayable"
   >;
@@ -341,6 +470,13 @@ export interface SoulRegistry extends BaseContract {
   ): T;
 
   getFunction(
+    nameOrSignature: "children"
+  ): TypedContractMethod<
+    [arg0: AddressLike, arg1: BigNumberish],
+    [string],
+    "view"
+  >;
+  getFunction(
     nameOrSignature: "documentAt"
   ): TypedContractMethod<
     [agent: AddressLike, docType: BigNumberish, version: BigNumberish],
@@ -354,6 +490,19 @@ export interface SoulRegistry extends BaseContract {
     [bigint],
     "view"
   >;
+  getFunction(
+    nameOrSignature: "getAccessKey"
+  ): TypedContractMethod<
+    [owner: AddressLike, reader: AddressLike, docType: BigNumberish],
+    [string],
+    "view"
+  >;
+  getFunction(
+    nameOrSignature: "getChildren"
+  ): TypedContractMethod<[agent: AddressLike], [string[]], "view">;
+  getFunction(
+    nameOrSignature: "getParent"
+  ): TypedContractMethod<[agent: AddressLike], [string], "view">;
   getFunction(
     nameOrSignature: "grantAccess"
   ): TypedContractMethod<
@@ -376,15 +525,35 @@ export interface SoulRegistry extends BaseContract {
     "view"
   >;
   getFunction(
+    nameOrSignature: "parent"
+  ): TypedContractMethod<[arg0: AddressLike], [string], "view">;
+  getFunction(
+    nameOrSignature: "registerChild"
+  ): TypedContractMethod<[child: AddressLike], [void], "nonpayable">;
+  getFunction(
     nameOrSignature: "registerSoul"
   ): TypedContractMethod<[], [void], "nonpayable">;
   getFunction(
     nameOrSignature: "registered"
   ): TypedContractMethod<[arg0: AddressLike], [boolean], "view">;
   getFunction(
+    nameOrSignature: "removeAccessKey"
+  ): TypedContractMethod<
+    [reader: AddressLike, docType: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
+  getFunction(
     nameOrSignature: "revokeAccess"
   ): TypedContractMethod<
     [reader: AddressLike, docType: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "storeAccessKey"
+  ): TypedContractMethod<
+    [reader: AddressLike, docType: BigNumberish, encryptedKey: BytesLike],
     [void],
     "nonpayable"
   >;
@@ -422,11 +591,25 @@ export interface SoulRegistry extends BaseContract {
     AccessGrantedEvent.OutputObject
   >;
   getEvent(
+    key: "AccessKeyStored"
+  ): TypedContractEvent<
+    AccessKeyStoredEvent.InputTuple,
+    AccessKeyStoredEvent.OutputTuple,
+    AccessKeyStoredEvent.OutputObject
+  >;
+  getEvent(
     key: "AccessRevoked"
   ): TypedContractEvent<
     AccessRevokedEvent.InputTuple,
     AccessRevokedEvent.OutputTuple,
     AccessRevokedEvent.OutputObject
+  >;
+  getEvent(
+    key: "ChildRegistered"
+  ): TypedContractEvent<
+    ChildRegisteredEvent.InputTuple,
+    ChildRegisteredEvent.OutputTuple,
+    ChildRegisteredEvent.OutputObject
   >;
   getEvent(
     key: "DocumentWritten"
@@ -455,6 +638,17 @@ export interface SoulRegistry extends BaseContract {
       AccessGrantedEvent.OutputObject
     >;
 
+    "AccessKeyStored(address,address,uint8)": TypedContractEvent<
+      AccessKeyStoredEvent.InputTuple,
+      AccessKeyStoredEvent.OutputTuple,
+      AccessKeyStoredEvent.OutputObject
+    >;
+    AccessKeyStored: TypedContractEvent<
+      AccessKeyStoredEvent.InputTuple,
+      AccessKeyStoredEvent.OutputTuple,
+      AccessKeyStoredEvent.OutputObject
+    >;
+
     "AccessRevoked(address,address,uint8)": TypedContractEvent<
       AccessRevokedEvent.InputTuple,
       AccessRevokedEvent.OutputTuple,
@@ -464,6 +658,17 @@ export interface SoulRegistry extends BaseContract {
       AccessRevokedEvent.InputTuple,
       AccessRevokedEvent.OutputTuple,
       AccessRevokedEvent.OutputObject
+    >;
+
+    "ChildRegistered(address,address)": TypedContractEvent<
+      ChildRegisteredEvent.InputTuple,
+      ChildRegisteredEvent.OutputTuple,
+      ChildRegisteredEvent.OutputObject
+    >;
+    ChildRegistered: TypedContractEvent<
+      ChildRegisteredEvent.InputTuple,
+      ChildRegisteredEvent.OutputTuple,
+      ChildRegisteredEvent.OutputObject
     >;
 
     "DocumentWritten(address,uint8,uint32,bytes32,string)": TypedContractEvent<

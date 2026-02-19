@@ -8,6 +8,11 @@ import { restoreCommand } from './commands/restore';
 import { exportCommand } from './commands/export';
 import { importCommand } from './commands/import';
 import { historyCommand } from './commands/history';
+import { grantCommand } from './commands/grant';
+import { revokeCommand } from './commands/revoke';
+import { accessCommand } from './commands/access';
+import { registerChildCommand } from './commands/register-child';
+import { readSharedCommand } from './commands/read-shared';
 import { printLogo } from './branding';
 
 const program = new Command();
@@ -28,5 +33,10 @@ program.addCommand(restoreCommand);
 program.addCommand(exportCommand);
 program.addCommand(importCommand);
 program.addCommand(historyCommand);
+program.addCommand(grantCommand);
+program.addCommand(revokeCommand);
+program.addCommand(accessCommand);
+program.addCommand(registerChildCommand);
+program.addCommand(readSharedCommand);
 
 program.parse();

@@ -38,8 +38,8 @@
       ]
     },
     "/home/paul/.openclaw/workspace/soulchain/packages/contracts/contracts/SoulRegistry.sol": {
-      "lastModificationDate": 1771475616382,
-      "contentHash": "782a21b1ef4c21be22749519e777d4ad",
+      "lastModificationDate": 1771511983541,
+      "contentHash": "cbd0fa4819c6f96f00bac14c7a463ef9",
       "sourceName": "contracts/SoulRegistry.sol",
       "solcConfig": {
         "version": "0.8.20",

@@ -29,6 +29,13 @@ const SOUL_REGISTRY_ABI = [
   'function verifyDocument(address agent, uint8 docType, uint32 version, bytes32 expectedHash) external view returns (bool)',
   'function grantAccess(address reader, uint8 docType) external',
   'function revokeAccess(address reader, uint8 docType) external',
+  'function hasAccess(address agent, address reader, uint8 docType) external view returns (bool)',
+  'function registerChild(address child) external',
+  'function getChildren(address agent) external view returns (address[])',
+  'function getParent(address agent) external view returns (address)',
+  'function storeAccessKey(address reader, uint8 docType, bytes encryptedKey) external',
+  'function getAccessKey(address owner, address reader, uint8 docType) external view returns (bytes)',
+  'function removeAccessKey(address reader, uint8 docType) external',
 ];
 
 /**
@@ -162,6 +169,68 @@ export class EVMChainProvider implements ChainProvider {
     const tx = await this.contract.revokeAccess(reader, docType);
     const receipt = await tx.wait();
     return receipt.hash;
+  }
+
+  async hasAccess(agent: string, reader: string, docType: number): Promise<boolean> {
+    await this.init();
+    try {
+      return await this.contract.hasAccess(agent, reader, docType);
+    } catch {
+      return false;
+    }
+  }
+
+  async registerChild(child: string): Promise<string> {
+    await this.init();
+    const tx = await this.contract.registerChild(child);
+    const receipt = await tx.wait();
+    return receipt.hash;
+  }
+
+  async getChildren(agent: string): Promise<string[]> {
+    await this.init();
+    return await this.contract.getChildren(agent);
+  }
+
+  async getParent(agent: string): Promise<string> {
+    await this.init();
+    return await this.contract.getParent(agent);
+  }
+
+  async storeAccessKey(reader: string, docType: number, encryptedKey: Buffer): Promise<string> {
+    await this.init();
+    const tx = await this.contract.storeAccessKey(reader, docType, '0x' + encryptedKey.toString('hex'));
+    const receipt = await tx.wait();
+    return receipt.hash;
+  }
+
+  async getAccessKey(owner: string, reader: string, docType: number): Promise<Buffer | null> {
+    await this.init();
+    try {
+      const result = await this.contract.getAccessKey(owner, reader, docType);
+      if (!result || result === '0x') return null;
+      return Buffer.from(result.slice(2), 'hex');
+    } catch {
+      return null;
+    }
+  }
+
+  async removeAccessKey(reader: string, docType: number): Promise<string> {
+    await this.init();
+    const tx = await this.contract.removeAccessKey(reader, docType);
+    const receipt = await tx.wait();
+    return receipt.hash;
+  }
+
+  async latestDocumentOf(agent: string, docType: number): Promise<DocumentEntry | null> {
+    await this.init();
+    try {
+      const raw = await this.contract.latestDocument(agent, docType);
+      if (!raw.contentHash || raw.contentHash === '0x' + '0'.repeat(64)) return null;
+      return this.toEntry(raw);
+    } catch {
+      return null;
+    }
   }
 
   /** Get explorer URL for a transaction */

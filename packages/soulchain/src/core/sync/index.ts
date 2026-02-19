@@ -11,5 +11,5 @@ export type { SyncItem } from './queue';
 export { SyncWorker } from './worker';
 export type { SyncWorkerConfig } from './worker';
 export { SyncEngine } from './engine';
-export type { CryptoProvider, IntegrityReport, MigrationReport, SyncStatus } from './engine';
+export type { CryptoProvider, IntegrityReport, MigrationReport, SyncStatus, AccessGrant, AccessMap } from './engine';
 export { createChainProvider } from './factory';

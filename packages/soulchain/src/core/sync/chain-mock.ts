@@ -8,6 +8,13 @@ export class MockChainProvider implements ChainProvider {
   private accessGrants = new Map<string, Set<number>>();
   private registered = false;
   private persistPath: string | null = null;
+  private childrenMap = new Map<string, string[]>();
+  private parentMap = new Map<string, string>();
+  private accessKeysMap = new Map<string, Buffer>(); // "owner:reader:docType" => key
+  // Multi-agent support for testing
+  private multiAgentDocs = new Map<string, Map<number, DocumentEntry[]>>(); // agent => docType => entries
+  private multiAgentGrants = new Map<string, Map<string, Set<number>>>(); // agent => reader => docTypes
+  private _currentAgent: string = 'default';
 
   constructor(persistDir?: string) {
     if (persistDir) {
@@ -104,10 +111,65 @@ export class MockChainProvider implements ChainProvider {
     return this.txHash();
   }
 
+  async hasAccess(agent: string, reader: string, docType: number): Promise<boolean> {
+    if (agent === reader) return true;
+    // Parent can always access child
+    if (this.parentMap.get(agent) === reader) return true;
+    const grants = this.accessGrants.get(reader);
+    return grants?.has(docType) ?? false;
+  }
+
+  async registerChild(child: string): Promise<string> {
+    const parent = this._currentAgent;
+    this.parentMap.set(child, parent);
+    const kids = this.childrenMap.get(parent) ?? [];
+    kids.push(child);
+    this.childrenMap.set(parent, kids);
+    return this.txHash();
+  }
+
+  async getChildren(agent: string): Promise<string[]> {
+    return this.childrenMap.get(agent) ?? [];
+  }
+
+  async getParent(agent: string): Promise<string> {
+    return this.parentMap.get(agent) ?? '0x0000000000000000000000000000000000000000';
+  }
+
+  async storeAccessKey(reader: string, docType: number, encryptedKey: Buffer): Promise<string> {
+    const key = `${this._currentAgent}:${reader}:${docType}`;
+    this.accessKeysMap.set(key, encryptedKey);
+    return this.txHash();
+  }
+
+  async getAccessKey(owner: string, reader: string, docType: number): Promise<Buffer | null> {
+    const key = `${owner}:${reader}:${docType}`;
+    return this.accessKeysMap.get(key) ?? null;
+  }
+
+  async removeAccessKey(reader: string, docType: number): Promise<string> {
+    const key = `${this._currentAgent}:${reader}:${docType}`;
+    this.accessKeysMap.delete(key);
+    return this.txHash();
+  }
+
+  async latestDocumentOf(agent: string, docType: number): Promise<DocumentEntry | null> {
+    // For mock, same as latestDocument (no multi-agent isolation in simple mock)
+    return this.latestDocument(docType);
+  }
+
+  /** Set current agent identity for mock testing */
+  setAgent(agent: string): void {
+    this._currentAgent = agent;
+  }
+
   /** Test helper */
   clear(): void {
     this.documents.clear();
     this.accessGrants.clear();
     this.registered = false;
+    this.childrenMap.clear();
+    this.parentMap.clear();
+    this.accessKeysMap.clear();
   }
 }

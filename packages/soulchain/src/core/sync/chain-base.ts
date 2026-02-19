@@ -122,6 +122,16 @@ export class BaseChainProvider implements ChainProvider {
     const receipt = await tx.wait();
     return receipt.hash;
   }
+
+  // Stub implementations for new interface methods (Base provider is legacy, use EVMChainProvider)
+  async hasAccess(_agent: string, _reader: string, _docType: number): Promise<boolean> { return false; }
+  async registerChild(_child: string): Promise<string> { throw new Error('Use EVMChainProvider for parent/child'); }
+  async getChildren(_agent: string): Promise<string[]> { return []; }
+  async getParent(_agent: string): Promise<string> { return '0x0000000000000000000000000000000000000000'; }
+  async storeAccessKey(_reader: string, _docType: number, _key: Buffer): Promise<string> { throw new Error('Use EVMChainProvider'); }
+  async getAccessKey(_owner: string, _reader: string, _docType: number): Promise<Buffer | null> { return null; }
+  async removeAccessKey(_reader: string, _docType: number): Promise<string> { throw new Error('Use EVMChainProvider'); }
+  async latestDocumentOf(_agent: string, docType: number): Promise<DocumentEntry | null> { return this.latestDocument(docType); }
 }
 
 export { NETWORKS as BASE_NETWORKS };
