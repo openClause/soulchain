@@ -83,7 +83,7 @@ export class SoulchainHook {
 
   private maybeIntercept(file: fs.PathOrFileDescriptor | fs.PathLike | fs.promises.FileHandle, data: any): void {
     if (typeof file !== 'string') return;
-    const resolved = path.resolve(file);
+    const resolved = path.resolve(this.workspaceDir, file);
     if (!this.trackedPaths.has(resolved)) return;
     this.onWrite(resolved, Buffer.isBuffer(data) ? data : Buffer.from(String(data)));
   }

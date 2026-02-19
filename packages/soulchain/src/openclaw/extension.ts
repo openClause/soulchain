@@ -113,7 +113,7 @@ export async function activate(workspaceDir: string, passphrase?: string): Promi
   hook.install();
 
   // 6. Start watcher
-  watcher = new FileWatcher(config, engine);
+  watcher = new FileWatcher(config, engine, workspaceDir);
   watcher.start();
 
   // 7. Verify

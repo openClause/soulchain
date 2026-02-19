@@ -163,7 +163,7 @@ export class SoulchainHook {
 
   private maybeInterceptWrite(file: fs.PathOrFileDescriptor | fs.PathLike | fs.promises.FileHandle, data: any): void {
     if (typeof file !== 'string') return;
-    const resolved = path.resolve(file);
+    const resolved = path.resolve(this.workspaceDir, file);
     if (!this.trackedPaths.has(resolved)) return;
     const relativePath = this.trackedRelative.get(resolved)!;
     const buf = Buffer.isBuffer(data) ? data : Buffer.from(String(data));
@@ -187,7 +187,7 @@ export class SoulchainHook {
 
   private isTrackedFile(file: any): string | null {
     if (typeof file !== 'string') return null;
-    const resolved = path.resolve(file);
+    const resolved = path.resolve(this.workspaceDir, file);
     return this.trackedRelative.get(resolved) ?? null;
   }
 
@@ -201,7 +201,7 @@ export class SoulchainHook {
     const relativePath = this.isTrackedFile(file);
     if (!relativePath) return null;
 
-    const resolved = path.resolve(file as string);
+    const resolved = path.resolve(this.workspaceDir, file as string);
 
     // Check if local cache is fresh
     if (this.cache && this.isLocalCacheFresh(relativePath, resolved)) {
@@ -238,7 +238,7 @@ export class SoulchainHook {
     const relativePath = this.isTrackedFile(file);
     if (!relativePath) return null;
 
-    const resolved = path.resolve(file as string);
+    const resolved = path.resolve(this.workspaceDir, file as string);
 
     // Check if local cache is fresh
     if (this.cache && this.isLocalCacheFresh(relativePath, resolved)) {

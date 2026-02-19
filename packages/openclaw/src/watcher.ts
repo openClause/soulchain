@@ -5,18 +5,20 @@ import type { SoulchainConfig, SyncEngine } from '@openclaused/core';
 export class FileWatcher {
   private config: SoulchainConfig;
   private engine: SyncEngine;
+  private workspaceDir: string;
   private watchers: fs.FSWatcher[] = [];
   private debounceTimers = new Map<string, NodeJS.Timeout>();
   private debounceMs = 500;
 
-  constructor(config: SoulchainConfig, engine: SyncEngine) {
+  constructor(config: SoulchainConfig, engine: SyncEngine, workspaceDir: string) {
     this.config = config;
     this.engine = engine;
+    this.workspaceDir = path.resolve(workspaceDir);
   }
 
   start(): void {
     for (const trackedPath of this.config.trackedPaths) {
-      const resolved = path.resolve(trackedPath);
+      const resolved = path.resolve(this.workspaceDir, trackedPath);
       try {
         const watcher = fs.watch(resolved, (_event) => {
           this.handleChange(trackedPath, resolved);
